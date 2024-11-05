@@ -172,8 +172,23 @@
       isTmpDir = true;
       hasIsTesting = true;
 
-      templates =
-        let
+      templates = let
+          # Defined here just so we can refer to it twice as default & simple.
+          simple = {
+            path = ./templates/simple;
+            description = "A direnv supported Nix flake with devenv integration.";
+            welcomeText = ''
+              # `.devenv` should be added to `.gitignore`
+              ```sh
+                echo .devenv >> .gitignore
+              ```
+            '';
+          };
+      in
+      {
+          inherit simple;
+          default = simple;
+
 
           flake-parts = {
             path = ./templates/flake-parts;
@@ -186,19 +201,6 @@
             '';
           };
 
-          simple = {
-            path = ./templates/simple;
-            description = "A direnv supported Nix flake with devenv integration.";
-            welcomeText = ''
-              # `.devenv` should be added to `.gitignore`
-              ```sh
-                echo .devenv >> .gitignore
-              ```
-            '';
-          };
-        in
-        {
-          inherit simple flake-parts;
           terraform = {
             path = ./templates/terraform;
             description = "A Terraform Nix flake with devenv integration.";
@@ -209,7 +211,27 @@
               ```
             '';
           };
-          default = simple;
+
+          rust = {
+            path = ./templates/rust-nightly;
+            description = "A Rust Nix flake with devenv integration.";
+            welcomeText = ''
+              # `.devenv` should be added to `.gitignore`
+              ```sh
+                echo .devenv >> .gitignore
+              ```
+            '';
+          };
+          rust-nightly = {
+            path = ./templates/rust-nightly;
+            description = "A Rust Nix flake with devenv integration.";
+            welcomeText = ''
+              # `.devenv` should be added to `.gitignore`
+              ```sh
+                echo .devenv >> .gitignore
+              ```
+            '';
+          };
         };
 
       flakeModule = import ./flake-module.nix self;

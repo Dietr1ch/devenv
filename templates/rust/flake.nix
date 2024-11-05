@@ -50,13 +50,21 @@
                 languages = {
                   rust = {
                     # https://devenv.sh/reference/options/#languagesrustenable
-                    enable = false;
+                    enable = true;
+
+                    # https://devenv.sh/reference/options/#languagesrustrustflags
+                    # NOTE: This must be kept in sync with .cargo/config.toml
+                    rustflags = nixpkgs.lib.strings.concatStringsSep " " [
+                    ];
                   };
                 };
 
                 # https://devenv.sh/reference/options/#packages
                 packages = with pkgs; [
-                  sl
+                  # Rust
+                  bacon
+
+                  rust-analyzer
                 ];
 
                 # https://devenv.sh/reference/options/#pre-commit
@@ -87,15 +95,30 @@
                     alejandra = {
                       enable = true;
                     };
+
+                    # Rust
+                    cargo-check = {
+                      enable = true;
+                    };
+                    clippy = {
+                      enable = true;
+                      settings = {
+                        allFeatures = true;
+                      };
+                    };
+                    rustfmt = {
+                      enable = true;
+                    };
                   };
                 };
 
                 enterShell = ''
-                  sl --version
+                  cargo --version
+                  rustc --version
                 '';
 
                 enterTest = ''
-                  sl
+                  cargo test
                 '';
 
               }
