@@ -1,0 +1,12 @@
+# OS
+## Unix
+.*
+
+
+# Nix
+!.envrc
+
+
+# Git
+!.ignore
+!.gitignore
