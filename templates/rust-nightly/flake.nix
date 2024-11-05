@@ -13,6 +13,12 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
   };
 
   nixConfig = {
@@ -32,11 +38,6 @@
       forEachSystem = nixpkgs.lib.genAttrs (import systems);
     in
     {
-      packages = forEachSystem (system: {
-        devenv-up = self.devShells.${system}.default.config.procfileScript;
-        devenv-test = self.devShells.${system}.default.config.test;
-      });
-
       devShells = forEachSystem (
         system:
         let
@@ -55,13 +56,36 @@
                 languages = {
                   rust = {
                     # https://devenv.sh/reference/options/#languagesrustenable
-                    enable = false;
+                    enable = true;
+                    channel = "nightly";
+                    mold = {
+                      enable = true;
+                    };
+
+                    # https://devenv.sh/reference/options/#languagesrustrustflags
+                    # NOTE: This must be kept in sync with .cargo/config.toml
+                    rustflags = nixpkgs.lib.strings.concatStringsSep " " [
+                    ];
                   };
                 };
 
                 # https://devenv.sh/reference/options/#packages
                 packages = with pkgs; [
-                  sl
+                  # Rust
+                  bacon
+
+                  rust-analyzer
+
+                  cargo-edit
+                  cargo-outdated
+                  cargo-deny
+                  cargo-bloat
+                  cargo-modules
+
+                  cargo-criterion
+                  cargo-flamegraph
+
+                  cargo-fuzz
                 ];
 
                 # https://devenv.sh/reference/options/#pre-commit
@@ -92,15 +116,30 @@
                     alejandra = {
                       enable = true;
                     };
+
+                    # Rust
+                    cargo-check = {
+                      enable = true;
+                    };
+                    clippy = {
+                      enable = true;
+                      settings = {
+                        allFeatures = true;
+                      };
+                    };
+                    rustfmt = {
+                      enable = true;
+                    };
                   };
                 };
 
                 enterShell = ''
-                  sl --version
+                  cargo --version
+                  rustc --version
                 '';
 
                 enterTest = ''
-                  sl
+                  cargo test
                 '';
 
               }
